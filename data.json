@@ -1,0 +1,205 @@
+{
+  "defaultLang": "hi",
+  "invocation": {
+    "en": "|| Shree Ganeshaya Namah ||",
+    "hi": "श्री महलासा मोहिनीराज प्रसन्न"
+  },
+  "intro": {
+    "en": "Together with their families, request the honour of your presence at the wedding of",
+    "hi": "अपने परिवारों के साथ, की शादी में अपनी उपस्थिति के सम्मान का अनुरोध करें"
+  },
+  "groom": {
+    "en": "Nitin",
+    "hi": "आरव"
+  },
+  "bride": {
+    "en": "Shivani",
+    "hi": "अनन्या"
+  },
+  "date": "2026-04-12",
+  "countdownTime": "00:00",
+  "muhurat": {
+    "en": "Pheras at 9:15 PM · Shubh Muhurat",
+    "hi": "फेरस रात 9:15 बजे · शुभ मुहूर्त"
+  },
+  "story": {
+    "en": "We met in 2019 over a cup of chai at a friend's wedding in Jaipur. Seven years, many road trips and one very long phone call later, we are ready to begin forever. Your blessings and presence will make our day complete.",
+    "hi": "हम 2019 में जयपुर में एक दोस्त की शादी में एक कप चाय पर मिले थे। सात साल, कई सड़क यात्राएं और एक बहुत लंबे फोन कॉल के बाद, हम हमेशा के लिए शुरू करने के लिए तैयार हैं। आपके आशीर्वाद और उपस्थिति से हमारा दिन पूरा हो जाएगा।"
+  },
+  "groomBio": {
+    "en": "A software engineer who loves cricket, old Hindi songs and his mother's rajma chawal.",
+    "hi": "एक सॉफ्टवेयर इंजीनियर जो क्रिकेट, पुराने हिंदी गाने और अपनी मां की राजमा चावल से प्यार करता है।"
+  },
+  "brideBio": {
+    "en": "A doctor who paints in her free time and never says no to a road trip.",
+    "hi": "एक डॉक्टर जो अपने खाली समय में पेंटिंग करती है और कभी भी सड़क यात्रा को ना नहीं कहती है।"
+  },
+  "images": {
+    "hero": "",
+    "groom": "",
+    "bride": "",
+    "ganesh": "img/ganesh.png",
+    "peacock": "img/peacock.png",
+    "kalash": "img/kalash.png"
+  },
+  "closing": {
+    "en": "Your presence is our greatest gift.",
+    "hi": "आपकी उपस्थिति हमारा सबसे बड़ा उपहार है।"
+  },
+  "events": [
+    {
+      "name": {
+        "en": "Haldi",
+        "hi": "à¤¹à¤²à¥â€à¤&#166;à¥€"
+      },
+      "date": "2026-12-05",
+      "time": {
+        "en": "11:00 AM",
+        "hi": "सुबह 11:00 बजे"
+      },
+      "place": {
+        "en": "Lawn at the family residence",
+        "hi": "परिवार के निवास पर लॉन"
+      },
+      "note": {
+        "en": "Dress code: yellow",
+        "hi": "ड्रेस कोड: पीला"
+      }
+    },
+    {
+      "name": {
+        "en": "Mehndi & Sangeet",
+        "hi": "मेहंदी एंड संगीत"
+      },
+      "date": "2026-12-05",
+      "time": {
+        "en": "7:00 PM",
+        "hi": "शाम 7:00 बजे"
+      },
+      "place": {
+        "en": "Banquet Hall, Royal Palace Gardens",
+        "hi": "बैंक्वेट हॉल, रॉयल पैलेस गार्डन"
+      },
+      "note": {
+        "en": "Dress code: bright and festive",
+        "hi": "ड्रेस कोड: उज्ज्वल और उत्सव"
+      }
+    },
+    {
+      "name": {
+        "en": "Baraat & Pheras",
+        "hi": "बारात एंड फेरस"
+      },
+      "date": "2026-12-06",
+      "time": {
+        "en": "6:00 PM",
+        "hi": "शाम 6:00 बजे"
+      },
+      "place": {
+        "en": "Main Gardens, Royal Palace Gardens",
+        "hi": "मेन गार्डन, रॉयल पैलेस गार्डन"
+      },
+      "note": {
+        "en": "Dress code: traditional",
+        "hi": "ड्रेस कोड: पारंपरिक"
+      }
+    },
+    {
+      "name": {
+        "en": "Reception",
+        "hi": "प्रीतिभोज"
+      },
+      "date": "2026-12-07",
+      "time": {
+        "en": "8:00 PM",
+        "hi": "रात्रि 8:00 बजे"
+      },
+      "place": {
+        "en": "Grand Ballroom, Royal Palace Gardens",
+        "hi": "ग्रैंड बॉलरूम, रॉयल पैलेस गार्डन्स"
+      },
+      "note": {
+        "en": "Dress code: formal or indo-western",
+        "hi": "परिधान: औपचारिक या इंडो-वेस्टर्न"
+      }
+    }
+  ],
+  "gallery": [
+    {
+      "img": "",
+      "cap": {
+        "en": "The first hello",
+        "hi": "पहली मुलाकात"
+      }
+    },
+    {
+      "img": "",
+      "cap": {
+        "en": "Chai and conversations",
+        "hi": "चाय और बातें"
+      }
+    },
+    {
+      "img": "",
+      "cap": {
+        "en": "Road trip to Udaipur",
+        "hi": "उदयपुर की सैर"
+      }
+    },
+    {
+      "img": "",
+      "cap": {
+        "en": "The proposal",
+        "hi": "प्रस्ताव"
+      }
+    },
+    {
+      "img": "",
+      "cap": {
+        "en": "Roka ceremony",
+        "hi": "रोका"
+      }
+    },
+    {
+      "img": "",
+      "cap": {
+        "en": "Forever begins",
+        "hi": "नई शुरुआत"
+      }
+    }
+  ],
+  "venueName": {
+    "en": "Royal Palace Gardens",
+    "hi": "रॉयल पैलेस गार्डन्स"
+  },
+  "venueAddress": {
+    "en": "Sample address: Civil Lines, Jaipur, Rajasthan 302006",
+    "hi": "नमूना पता: सिविल लाइन्स, जयपुर, राजस्थान 302006"
+  },
+  "mapUrl": "https://www.google.com/maps/search/?api=1&query=Jaipur",
+  "travel": {
+    "en": "Nearest airport: Jaipur International (18 km). Rooms are arranged for outstation guests. Parking is available at the venue.",
+    "hi": "निकटतम हवाई अड्डा: जयपुर अंतरराष्ट्रीय (18 किमी)। बाहर से आने वाले मेहमानों के ठहरने की व्यवस्था है। स्थल पर पार्किंग उपलब्ध है।"
+  },
+  "groomFamily": {
+    "en": "Mr. & Mrs. Rakesh Sharma\nand family",
+    "hi": "श्री एवं श्रीमती राकेश शर्मा\nएवं परिवार"
+  },
+  "brideFamily": {
+    "en": "Mr. & Mrs. Vinod Mehta\nand family",
+    "hi": "श्री एवं श्रीमती विनोद मेहता\nएवं परिवार"
+  },
+  "wellwishers": {
+    "en": "Eagerly awaited by: all members of the Sharma and Mehta families",
+    "hi": "दर्शनाभिलाषी: शर्मा एवं मेहता परिवार के समस्त सदस्य"
+  },
+  "rsvpName": {
+    "en": "Rakesh Sharma",
+    "hi": "राकेश शर्मा"
+  },
+  "phone": "+91 98765 43210",
+  "rsvpBy": {
+    "en": "Kindly reply by 20 November 2026",
+    "hi": "कृपया 20 नवंबर 2026 तक सूचित करें"
+  }
+}

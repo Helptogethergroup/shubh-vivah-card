@@ -353,7 +353,7 @@ html[lang="hi"] .g2{font-family:var(--f-disp);font-style:italic;font-weight:600}
     "hi": "अपने परिवारजनों सहित हम आपको सादर आमंत्रित करते हैं, इनके शुभ विवाह उत्सव में"
   },
   "groom": {
-    "en": "Aarav",
+    "en": "Nitin",
     "hi": "आरव"
   },
   "bride": {
@@ -559,10 +559,12 @@ let lang=S.defaultLang==='en'?'en':'hi';
 const hashLang=()=>{const h=String(location.hash||'').replace('#','').toLowerCase();return h==='en'||h==='hi'?h:null};
 if(hashLang())lang=hashLang();
 let isAdmin=false,sampler=null,autoTr=true;
+const inFrame=window.parent!==window;
+let started=false,gotPreview=false;
 let artifact=null,assets=null,settled=false;
 const reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
-let gateOpen=reduce;
-if(reduce)settled=true;
+let gateOpen=reduce||inFrame;
+if(reduce||inFrame)settled=true;
 
 const UI={
   en:{lang:'Language',cdT:'Counting down to the big day',dd:'Days',hh:'Hours',mm:'Minutes',ss:'Seconds',couple:'The Couple',groom:'The Groom',bride:'The Bride',save:'Save the date',addCal:'Add to Google Calendar',programs:'Wedding Programme',gallery:'Moments Together',venue:'Venue & Travel',directions:'Get directions',travel:'Getting there',families:'Invited by',groomSide:"Groom's family",brideSide:"Bride's family",rsvp:'Kindly respond',copy:'Copy number',whatsapp:'WhatsApp',copied:'Number copied',copyFail:'Select the number above and copy it',withLove:'With love'},
@@ -827,7 +829,7 @@ function cutImg(id,cls,alt){
   return '<img class="'+cls+' gpre" data-cut="'+esc(src)+'" src="'+esc(src)+'" alt="'+a+'">';
 }
 function gate(){
-  if(reduce)return;
+  if(reduce||inFrame)return;
   try{history.scrollRestoration='manual'}catch(e){}
   window.scrollTo(0,0);
   document.documentElement.style.overflow='hidden';document.body.style.overflow='hidden';
@@ -1062,10 +1064,22 @@ function initAdmin(){
 }
 
 addEventListener('hashchange',()=>{const h=hashLang();if(h&&h!==lang){lang=h;render()}});
-render();
-petals();
-progress();
-gate();
+function start(){
+  if(!hashLang())lang=S.defaultLang==='en'?'en':'hi';
+  render();petals();progress();gate();
+  started=true;
+  if(inFrame){try{parent.postMessage({type:'ready'},location.origin)}catch(e){}}
+}
+addEventListener('message',e=>{
+  if(e.origin!==location.origin||!e.data)return;
+  const d=e.data;
+  if(d.type==='preview'&&d.state){gotPreview=true;S=d.state;if(started)render()}
+  if(d.type==='lang'&&(d.lang==='en'||d.lang==='hi')){lang=d.lang;if(started)render()}
+});
+fetch('data.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null).then(d=>{
+  if(d&&d.groom&&!gotPreview)S=d;
+  start();
+});
 try{
   if(window.claude&&window.claude.use){
     Promise.all([window.claude.use('user'),window.claude.use('artifact'),window.claude.use('assets'),window.claude.use('sample')]).then(r=>{

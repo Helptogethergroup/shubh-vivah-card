@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Wedding Card Admin</title>
+<style>
+:root{--bg:#f7efdc;--paper:#fffaf0;--ink:#3b2418;--mute:#7a5f4d;--edge:#d9c79a;--gold:#b8862b;--brown:#3a2012;--ok:#2f7d57;--err:#a63b3b;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--brown);color:#f6e6c8;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+header h1{font-size:1.05rem;margin:0;margin-right:auto}
+button,.btn{font:inherit;cursor:pointer;border-radius:999px;border:1px solid var(--edge);background:var(--paper);color:var(--ink);padding:6px 14px}
+header button{background:transparent;color:#f6e6c8;border-color:rgba(246,230,200,.5)}
+header button.go{background:#f0c966;color:#2a1409;border-color:#f0c966;font-weight:600}
+header button:disabled{opacity:.55;cursor:wait}
+#msg{flex-basis:100%;margin:0;font-size:.9rem;min-height:1.3em}
+#msg.err{color:#ffb4a8}#msg.ok{color:#a8f0c6}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:16px;max-width:1280px;margin:0 auto}
+@media (min-width:1000px){.wrap{grid-template-columns:minmax(0,640px) minmax(0,1fr);align-items:start}}
+#form{min-width:0}
+#pv{display:none}
+#pv.on{display:block}
+@media (min-width:1000px){#pv{display:block;position:sticky;top:76px}}
+#pv iframe{width:100%;max-width:400px;height:min(78vh,760px);border:8px solid var(--brown);border-radius:26px;background:#22110a;display:block;margin:0 auto}
+#pv .hint{text-align:center;color:var(--mute);font-size:.85rem}
+h2{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:26px 0 8px}
+.card{background:var(--paper);border:1px solid var(--edge);border-radius:12px;padding:12px 14px;margin:0 0 12px}
+.fld{margin:0 0 12px;min-width:0}
+.lab{font-weight:600;font-size:.9rem;margin-bottom:4px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:560px){.pair{grid-template-columns:1fr}}
+.pair label,.fld>label{display:block;min-width:0}
+.pair label span{display:block;font-size:.72rem;color:var(--mute)}
+input[type=text],input[type=date],input[type=time],input[type=password],textarea,select{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--edge);border-radius:8px;background:#fffdf6;color:var(--ink)}
+textarea{resize:vertical}
+.ev{border:1px solid var(--edge);border-radius:12px;padding:10px 12px 2px;margin:0 0 12px;background:#fbf3e1}
+.evh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.evh span{display:flex;gap:6px}
+.sm{display:inline-block;padding:3px 12px;font-size:.85rem}
+.del{color:var(--err)}
+.add{width:100%;border:1px dashed var(--gold);border-radius:10px;padding:10px;margin-bottom:8px;background:none}
+.imgrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.imgrow img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--edge)}
+.noimg{width:64px;height:64px;border-radius:10px;border:1px dashed var(--edge);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--mute);text-align:center}
+.note{font-size:.85rem;color:var(--mute);margin:4px 0 0}
+code{background:#efe3c4;padding:1px 5px;border-radius:4px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-weight:600}
+.chk input{width:auto;margin-top:5px}
+#setup[hidden]{display:none}
+ol{padding-left:20px;margin:6px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>Wedding Card Admin</h1>
+  <button type="button" id="bset">Settings</button>
+  <button type="button" id="bpv">Preview</button>
+  <button type="button" id="bhi">हिन्दी card</button>
+  <button type="button" id="ben">English card</button>
+  <button type="button" class="go" id="bsave">Save to website</button>
+  <p id="msg" aria-live="polite"></p>
+</header>
+
+<div class="wrap">
+  <div id="form"></div>
+  <aside id="pv">
+    <iframe id="frame" src="index.html" title="Card preview"></iframe>
+    <p class="hint">Live preview. New photos show here after the site updates (1 to 2 minutes).</p>
+  </aside>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var CFG={repo:'Helptogethergroup/shubh-vivah-card',branch:'main',token:''};
+try{var sv=JSON.parse(localStorage.getItem('cardadmin')||'{}');if(sv.repo)CFG.repo=sv.repo;if(sv.branch)CFG.branch=sv.branch;if(sv.token)CFG.token=sv.token}catch(e){}
+var S=null,local={},autoTr=true,previewLang='hi';
+
+function say(t,c){var m=$('#msg');m.textContent=t||'';m.className=c||''}
+function get(p){return p.split('.').reduce(function(o,k){return o==null?o:o[k]},S)}
+function setp(p,v){var k=p.split('.'),o=S;for(var i=0;i<k.length-1;i++)o=o[k[i]];o[k[k.length-1]]=v}
+
+/* ---------- form pieces ---------- */
+function bi(label,p,o){
+  o=o||{};
+  return '<div class="fld"><div class="lab">'+label+'</div><div class="pair">'+['en','hi'].map(function(l){
+    var v=esc(get(p+'.'+l)||''),pp=p+'.'+l,na=o.noauto?' data-noauto="1"':'';
+    return '<label><span>'+(l==='en'?'English':'हिन्दी')+'</span>'+(o.area?'<textarea rows="3" data-p="'+pp+'"'+na+'>'+v+'</textarea>':'<input type="text" data-p="'+pp+'"'+na+' value="'+v+'">')+'</label>';
+  }).join('')+'</div></div>';
+}
+function one(kind,label,p){
+  var v=esc(get(p)||'');
+  if(kind==='sel')return '<div class="fld"><label><div class="lab">'+label+'</div><select data-p="'+p+'"><option value="hi"'+(get(p)==='hi'?' selected':'')+'>हिन्दी</option><option value="en"'+(get(p)==='en'?' selected':'')+'>English</option></select></label></div>';
+  return '<div class="fld"><label><div class="lab">'+label+'</div><input type="'+kind+'" data-p="'+p+'" value="'+v+'"></label></div>';
+}
+function imgf(label,p){
+  var v=get(p)||'',src=local[v]||v;
+  return '<div class="fld"><div class="lab">'+label+'</div><div class="imgrow">'+(v?'<img src="'+esc(src)+'" alt="">':'<div class="noimg">No photo</div>')+
+    '<label class="btn sm">Choose photo<input type="file" accept="image/*" data-up="'+p+'" hidden></label>'+(v?'<button type="button" class="sm del" data-a="rmimg" data-p="'+p+'">Remove</button>':'')+'</div></div>';
+}
+function formHtml(){
+  var h='<div class="card"><label class="chk"><input type="checkbox" id="autotr"'+(autoTr?' checked':'')+'> Fill the Hindi automatically when I change the English</label>'+
+    '<p class="note">Uses a free online translator. Names and short words can come out wrong, so read the Hindi once. You can always type the Hindi yourself.</p>'+
+    '<p style="margin:8px 0 0"><button type="button" data-a="trall">Translate everything to Hindi now</button></p></div>';
+  h+='<h2>Cover and basics</h2>'+one('sel','Language when the link has no #hi or #en','defaultLang')+bi('Opening line','invocation')+bi('Invitation message','intro',{area:1})+
+    bi('Groom name','groom',{noauto:1})+bi('Bride name','bride',{noauto:1})+one('date','Wedding date','date')+one('time','Countdown ends at (time)','countdownTime')+bi('Muhurat line','muhurat')+bi('Closing line','closing',{area:1});
+  h+='<h2>Photos</h2><p class="note">Ganesh ji, peacock and kalash pictures are already set. Add couple photos if you like.</p>'+
+    imgf('Cover photo (inside the arch)','images.hero')+imgf('Groom photo','images.groom')+imgf('Bride photo','images.bride')+
+    imgf('Ganesh ji picture','images.ganesh')+imgf('Peacock picture','images.peacock')+imgf('Kalash picture','images.kalash');
+  h+='<h2>Our story</h2>'+bi('Story','story',{area:1})+bi('About the groom','groomBio',{area:1})+bi('About the bride','brideBio',{area:1});
+  h+='<h2>Programme</h2>'+S.events.map(function(e,i){
+    return '<div class="ev"><div class="evh"><b>Event '+(i+1)+'</b><span><button type="button" class="sm" data-a="up" data-i="'+i+'">↑</button><button type="button" class="sm" data-a="down" data-i="'+i+'">↓</button><button type="button" class="sm del" data-a="del" data-i="'+i+'">Remove</button></span></div>'+
+      bi('Event name','events.'+i+'.name')+one('date','Date','events.'+i+'.date')+bi('Time','events.'+i+'.time')+bi('Place','events.'+i+'.place')+bi('Note (dress code etc.)','events.'+i+'.note')+'</div>';
+  }).join('')+'<button type="button" class="add" data-a="add">+ Add event</button>';
+  h+='<h2>Gallery</h2>'+S.gallery.map(function(g,i){
+    return '<div class="ev"><div class="evh"><b>Photo '+(i+1)+'</b><span><button type="button" class="sm" data-a="gup" data-i="'+i+'">↑</button><button type="button" class="sm" data-a="gdown" data-i="'+i+'">↓</button><button type="button" class="sm del" data-a="gdel" data-i="'+i+'">Remove</button></span></div>'+
+      imgf('Picture','gallery.'+i+'.img')+bi('Caption','gallery.'+i+'.cap')+'</div>';
+  }).join('')+(S.gallery.length<12?'<button type="button" class="add" data-a="gadd">+ Add gallery photo</button>':'');
+  h+='<h2>Venue</h2>'+bi('Venue name','venueName')+bi('Venue address','venueAddress',{area:1})+one('text','Google Maps link (starts with https://)','mapUrl')+bi('How to reach, stay, parking','travel',{area:1});
+  h+='<h2>Families</h2>'+bi("Groom's family",'groomFamily',{area:1})+bi("Bride's family",'brideFamily',{area:1})+bi('Eagerly awaited by','wellwishers',{area:1});
+  h+='<h2>RSVP</h2>'+bi('Contact person','rsvpName',{noauto:1})+one('text','Phone / WhatsApp number','phone')+bi('Reply-by line','rsvpBy');
+  return h;
+}
+function setupHtml(){
+  return '<div class="card" id="setup"><b>One-time setup: connect to GitHub</b>'+
+    '<p class="note">Saving needs a GitHub token that is allowed to change only this repository. It is kept in this browser only.</p>'+
+    '<ol><li>Open GitHub, then <b>Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</b>.</li>'+
+    '<li>Repository access: <b>Only select repositories</b> and pick <code>shubh-vivah-card</code>.</li>'+
+    '<li>Permissions: <b>Contents → Read and write</b>. Generate and copy the token.</li></ol>'+
+    '<div class="fld"><label><div class="lab">GitHub token</div><input type="password" id="ctok" autocomplete="off" value="'+esc(CFG.token)+'"></label></div>'+
+    '<div class="pair"><label><span>Repository</span><input type="text" id="crepo" value="'+esc(CFG.repo)+'"></label><label><span>Branch</span><input type="text" id="cbr" value="'+esc(CFG.branch)+'"></label></div>'+
+    '<p style="margin:10px 0 0"><button type="button" id="csave">Save settings</button></p></div>';
+}
+function fill(keepScroll){
+  var y=window.scrollY;
+  $('#form').innerHTML=setupHtml()+formHtml();
+  $('#setup').hidden=!!CFG.token&&!showSetup;
+  if(keepScroll)window.scrollTo(0,y);
+}
+var showSetup=false;
+
+/* ---------- preview ---------- */
+var pvT=null;
+function sendPreview(){
+  clearTimeout(pvT);
+  pvT=setTimeout(function(){
+    var w=$('#frame').contentWindow;if(!w)return;
+    try{w.postMessage({type:'preview',state:S},location.origin);w.postMessage({type:'lang',lang:previewLang},location.origin)}catch(e){}
+  },250);
+}
+window.addEventListener('message',function(e){if(e.origin===location.origin&&e.data&&e.data.type==='ready')sendPreview()});
+
+/* ---------- translation (free MyMemory service) ---------- */
+function tr(text){
+  return fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text)+'&langpair=en|hi').then(function(r){return r.json()}).then(function(j){
+    var t=j&&j.responseData&&j.responseData.translatedText;
+    if(!t||/MYMEMORY WARNING|INVALID/i.test(t))throw new Error('x');
+    return t;
+  });
+}
+function transField(p,inp){
+  var en=String(get(p)||''),hp=p.replace(/\.en$/,'.hi');
+  var put=function(t){setp(hp,t);var i=document.querySelector('[data-p="'+hp+'"]');if(i)i.value=t;sendPreview()};
+  if(!en.trim()){put('');return}
+  if(en.length>480){say('That text is long. Type the Hindi yourself or shorten the English.','err');return}
+  say('Updating the Hindi…');
+  tr(en).then(function(t){if(String(get(p)||'')===en){put(t);say('Hindi updated. Read it once, then Save.','ok')}},function(){say('Could not translate now. Type the Hindi yourself.','err')});
+}
+function transAll(){
+  var els=[].slice.call(document.querySelectorAll('[data-p$=".en"]')).filter(function(i){return !i.getAttribute('data-noauto')&&String(get(i.getAttribute('data-p'))||'').trim()});
+  var i=0;say('Translating everything…');
+  (function next(){
+    if(i>=els.length){fill(true);sendPreview();say('Hindi updated everywhere. Read it once, then Save.','ok');return}
+    var p=els[i++].getAttribute('data-p'),en=String(get(p));
+    if(en.length>480){next();return}
+    tr(en).then(function(t){setp(p.replace(/\.en$/,'.hi'),t);say('Translating… '+i+' of '+els.length);next()},function(){say('Stopped: the translator is busy. Try again in a minute.','err');fill(true)});
+  })();
+}
+
+/* ---------- GitHub saving ---------- */
+function api(path,opt){
+  opt=opt||{};
+  opt.headers=Object.assign({'Authorization':'Bearer '+CFG.token,'Accept':'application/vnd.github+json'},opt.headers||{});
+  return fetch('https://api.github.com/repos/'+CFG.repo+'/contents/'+path,opt);
+}
+function b64utf8(s){return btoa(unescape(encodeURIComponent(s)))}
+function save(){
+  if(!CFG.token){showSetup=true;fill(false);window.scrollTo(0,0);say('First add your GitHub token in the setup box.','err');return}
+  var b=$('#bsave');b.disabled=true;say('Saving…');
+  var url='data.json?ref='+encodeURIComponent(CFG.branch);
+  api(url).then(function(r){
+    if(r.status===401||r.status===403)throw {code:'auth'};
+    return r.ok?r.json():null;
+  }).then(function(cur){
+    var body={message:'Update card details',content:b64utf8(JSON.stringify(S,null,2)),branch:CFG.branch};
+    if(cur&&cur.sha)body.sha=cur.sha;
+    return api('data.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  }).then(function(r){
+    if(r.status===401||r.status===403)throw {code:'auth'};
+    if(!r.ok)throw {code:'http'+r.status};
+    say('Saved. The website updates in 1 to 2 minutes.','ok');
+  }).catch(function(e){
+    say(e&&e.code==='auth'?'GitHub refused the token. Check that it can write Contents on this repository.':'Could not save ('+(e&&e.code||'network')+'). Check your internet and try again.','err');
+  }).then(function(){b.disabled=false});
+}
+function shrink(file){
+  return createImageBitmap(file).then(function(bm){
+    var k=Math.min(1,1600/Math.max(bm.width,bm.height)),c=document.createElement('canvas');
+    c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+    return new Promise(function(res){c.toBlob(res,'image/jpeg',.86)});
+  });
+}
+function blobB64(blob){return new Promise(function(res){var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1])};r.readAsDataURL(blob)})}
+function uploadPhoto(p,file){
+  if(!CFG.token){showSetup=true;fill(false);window.scrollTo(0,0);say('First add your GitHub token in the setup box.','err');return}
+  say('Uploading photo…');
+  var path='img/photo-'+Date.now()+'.jpg',dataUrl='';
+  shrink(file).then(function(blob){
+    dataUrl=URL.createObjectURL(blob);
+    return blobB64(blob);
+  }).then(function(b64){
+    return api(path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Add photo',content:b64,branch:CFG.branch})});
+  }).then(function(r){
+    if(!r.ok)throw new Error('x');
+    local[path]=dataUrl;setp(p,path);fill(true);sendPreview();say('Photo added. Press Save to website.','ok');
+  }).catch(function(){say('Photo upload failed. Check the token and try again.','err')});
+}
+
+/* ---------- events ---------- */
+document.addEventListener('input',function(ev){
+  var t=ev.target,p=t.getAttribute&&t.getAttribute('data-p');
+  if(p&&t.tagName!=='BUTTON'){setp(p,t.value);sendPreview()}
+});
+document.addEventListener('change',function(ev){
+  var t=ev.target;
+  if(t.id==='autotr'){autoTr=t.checked;return}
+  var up=t.getAttribute&&t.getAttribute('data-up');
+  if(up&&t.files&&t.files[0]){uploadPhoto(up,t.files[0]);return}
+  var p=t.getAttribute&&t.getAttribute('data-p');
+  if(p&&t.tagName==='SELECT'){setp(p,t.value);sendPreview()}
+  if(autoTr&&p&&/\.en$/.test(p)&&!t.getAttribute('data-noauto'))transField(p,t);
+});
+document.addEventListener('click',function(ev){
+  var t=ev.target;
+  if(t.id==='csave'){
+    CFG.token=$('#ctok').value.trim();CFG.repo=$('#crepo').value.trim();CFG.branch=$('#cbr').value.trim()||'main';
+    try{localStorage.setItem('cardadmin',JSON.stringify(CFG))}catch(e){}
+    showSetup=false;fill(true);say('Settings saved on this device.','ok');return;
+  }
+  var b=t.closest&&t.closest('[data-a]');if(!b)return;
+  var a=b.getAttribute('data-a'),i=+b.getAttribute('data-i'),E=S.events,G=S.gallery;
+  function mv(A,d){var j=i+d;if(j>=0&&j<A.length){var x=A[i];A[i]=A[j];A[j]=x}}
+  if(a==='trall'){transAll();return}
+  if(a==='add')E.push({name:{en:'New event',hi:'नया कार्यक्रम'},date:S.date,time:{en:'7:00 PM',hi:'सायं 7:00 बजे'},place:{en:'',hi:''},note:{en:'',hi:''}});
+  if(a==='del')E.splice(i,1);
+  if(a==='up')mv(E,-1);if(a==='down')mv(E,1);
+  if(a==='gadd')G.push({img:'',cap:{en:'New moment',hi:'नया पल'}});
+  if(a==='gdel')G.splice(i,1);
+  if(a==='gup')mv(G,-1);if(a==='gdown')mv(G,1);
+  if(a==='rmimg')setp(b.getAttribute('data-p'),'');
+  fill(true);sendPreview();
+});
+$('#bsave').addEventListener('click',save);
+$('#bset').addEventListener('click',function(){showSetup=!showSetup;fill(false);window.scrollTo(0,0)});
+$('#bpv').addEventListener('click',function(){$('#pv').classList.toggle('on');sendPreview()});
+$('#bhi').addEventListener('click',function(){previewLang='hi';$('#pv').classList.add('on');sendPreview()});
+$('#ben').addEventListener('click',function(){previewLang='en';$('#pv').classList.add('on');sendPreview()});
+$('#frame').addEventListener('load',sendPreview);
+
+/* ---------- load current details ---------- */
+function fromIndex(){
+  return fetch('index.html').then(function(r){return r.text()}).then(function(h){
+    var m=/<script type="application\/json" id="state">([\s\S]*?)<\/script>/.exec(h);
+    return JSON.parse(m[1]);
+  });
+}
+fetch('data.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():fromIndex()}).catch(fromIndex).then(function(d){
+  S=d;
+  S.images=S.images||{};S.events=S.events||[];S.gallery=S.gallery||[];
+  fill(false);sendPreview();
+  if(!CFG.token){showSetup=true;fill(false)}
+}).catch(function(){say('Could not load the card details. Open this page from the website link, not as a file.','err')});
+})();
+</script>
+</body>
+</html>

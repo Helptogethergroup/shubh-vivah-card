@@ -25,3 +25,12 @@ jaise `"groom": "img/groom.jpg"`.
    ```
 3. Repo mein Settings -> Pages -> Source: "Deploy from a branch" -> main / (root) -> Save.
 4. 1-2 minute baad link ban jata hai.
+
+## Admin page (code chhue bina details badalna)
+1. Site ka link kholo aur aakhir mein `admin.html` likho:
+   `https://helptogethergroup.github.io/shubh-vivah-card/admin.html`
+2. Pehli baar "GitHub token" bharna hoga (page par steps likhe hain). Token sirf is shubh-vivah-card repo ko badal sakta hai.
+3. Form mein English badlo, Hindi apne aap bhar jata hai (free translator se, ek baar padh lena).
+4. "Save to website" dabao. 1-2 minute mein card update ho jata hai. Link wahi rehta hai.
+
+Details `data.json` mein save hoti hain (`index.html` ke andar wali details sirf shuruaati hain).
